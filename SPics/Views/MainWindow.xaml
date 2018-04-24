@@ -1,0 +1,35 @@
+﻿<Window x:Class="SPics.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:SPics"
+        mc:Ignorable="d"
+        xmlns:converters="clr-namespace:SPics.Converters"
+        Title="MainWindow" Height="650" Width="525">
+    <Window.Resources>
+        <converters:ImageConverter x:Key="ImageConverter" />
+    </Window.Resources>
+
+    <Grid>
+        <TextBox x:Name="tbSettings" HorizontalAlignment="Left" Height="23" Margin="97,13,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="410"/>
+        <Label x:Name="label" Content="Settings Path" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
+        <Button x:Name="btnAdd" Content="AddPics" HorizontalAlignment="Left" Margin="14,63,0,0" VerticalAlignment="Top" Width="100" Command="{Binding RunCommand}" />
+        <ListView x:Name="lvPics" HorizontalAlignment="Left" Height="500" Margin="14,119,0,0" VerticalAlignment="Top" Width="484" ItemsSource="{Binding PicsList}">
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Width="50" Header="Name" DisplayMemberBinding="{Binding Name}" />
+                    <GridViewColumn Width="50" Header="Tags" DisplayMemberBinding="{Binding TagsAsString}"/>
+                    <GridViewColumn Header="Image">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <Image Source="{Binding Path, Converter={StaticResource ImageConverter}}" />
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+
+                </GridView>
+            </ListView.View>
+        </ListView>
+    </Grid>
+</Window>
