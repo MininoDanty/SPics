@@ -1,4 +1,5 @@
 ﻿<Pics>
-  <Pic Tags="soyunTag, otro tag">Horno1.PNG</Pic>
-  <Pic Tags="soyunTag">zona2.PNG</Pic>
+  <Pic Tags="horno">Horno1.PNG</Pic>
+  <Pic Tags="zona, zona 2">zona2.PNG</Pic>
+  <Pic Tags="zona, zona x">zonax.PNG</Pic>
 </Pics>

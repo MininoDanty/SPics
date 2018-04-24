@@ -15,7 +15,8 @@ namespace SPics.Models
         public Image Image { get; set; }
 
         public List<string> Tags { get; set; }
-        public string TagsAsString {
+        public string TagsAsString
+        {
             get
             {
                 if (Tags != null)
@@ -29,11 +30,20 @@ namespace SPics.Models
                     return result.Remove(result.Length - SEPARADOR.Length, SEPARADOR.Length);
                 }
 
+
                 return "Error";
             }
             set
             {
+                ;
             }
         }
+
+
+
+        public string TagsForUI { get; set; }
+
+
+
     }
 }

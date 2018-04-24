@@ -2,9 +2,9 @@
 
 namespace SPics.Models
 {
-    internal class SPicsDirectory
+    public class SPicsDirectory
     {
         internal List<Pic> Files { get; set; }
-        internal string path { get; set; }
+        public string path { get; set; }
     }
 }

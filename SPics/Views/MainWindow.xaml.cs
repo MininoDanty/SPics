@@ -1,5 +1,9 @@
-﻿using System.Windows;
-
+﻿using SPics.Views.VM;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Windows;
+using System.Windows.Controls;
 
 namespace SPics
 {
@@ -13,6 +17,23 @@ namespace SPics
             InitializeComponent();
         }
 
+        private void tbSearch_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
+        {
+            var vm = (MainViewModel)this.DataContext;
+
+            var tb = (TextBox)sender;
+            var r = MainViewModel.GetFilteredResultsByName(vm.OriginalPicsList.ToList(), tb.Text);
+            vm.PicsList = new ObservableCollection<Models.Pic>(r);
+        }
+
+        private void tbSearchTag_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            var vm = (MainViewModel)this.DataContext;
+
+            var tb = (TextBox)sender;
+            var r = MainViewModel.GetFilteredResultsByTag(vm.OriginalPicsList.ToList(), tb.Text);
+            vm.PicsList = new ObservableCollection<Models.Pic>(r);
+        }
 
 
     }

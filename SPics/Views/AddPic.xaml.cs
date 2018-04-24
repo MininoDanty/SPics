@@ -1,4 +1,6 @@
-﻿using System;
+﻿using SPics.Models;
+using SPics.Views.VM;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -22,6 +24,19 @@ namespace SPics.Views
         public AddPic()
         {
             InitializeComponent();
+        }
+
+        private void lvPics_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            var vm = (AddPicViewModel)this.DataContext;
+            vm.ExecuteSaveCommand();
+
+            this.Close();
         }
     }
 }

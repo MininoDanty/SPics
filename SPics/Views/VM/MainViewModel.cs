@@ -1,5 +1,6 @@
 ﻿using Microsoft.Win32;
 using SPics.Models;
+using SPics.Utils;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -10,6 +11,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using System.Windows.Input;
 using System.Xml;
 using System.Xml.Linq;
@@ -17,12 +19,14 @@ using System.Xml.Linq;
 
 namespace SPics.Views.VM
 {
+    //https://stackoverflow.com/questions/14444285/listview-with-treeviewitems-in-xaml
     internal class MainViewModel : INotifyPropertyChanged
     {
-        private string current = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+        private string currentPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
         private string XmlSettings = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + @"\SPicsSettings.xml";
         private string XmlTags = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + @"\PicsTags.xml";
 
+        #region bindings
 
         public string XMLSETTINGS
         {
@@ -36,6 +40,40 @@ namespace SPics.Views.VM
                 {
                     XmlSettings = value;
                     NotifyPropertyChanged(nameof(XMLSETTINGS));
+                }
+            }
+        }
+
+        private string searchText = "";
+        public string SearchText
+        {
+            get { return searchText; }
+            set
+            {
+                if (value != null)
+                {
+                    //var result = GetFilteredResults(PicsList.ToList(), value);                    
+                    //PicsList = new ObservableCollection<Pic>(result);
+
+                    searchText = value;
+                    NotifyPropertyChanged(nameof(SearchText));
+                }
+            }
+        }
+
+        private ObservableCollection<Pic> originalPicsList;
+        public ObservableCollection<Pic> OriginalPicsList
+        {
+            get
+            {
+                return originalPicsList;
+            }
+            set
+            {
+                if (value != originalPicsList)
+                {
+                    originalPicsList = value;
+                    NotifyPropertyChanged(nameof(OriginalPicsList));
                 }
             }
         }
@@ -59,45 +97,180 @@ namespace SPics.Views.VM
         }
 
 
-        private SPicsDirectory MyImgDirectory;
+        private SPicsDirectory myImgDirectory;
+        public SPicsDirectory MyImgDirectory
+        {
+            get
+            {
+                return myImgDirectory;
+            }
+            set
+            {
+                if (value != myImgDirectory)
+                {
+                    myImgDirectory = value;
+                    NotifyPropertyChanged(nameof(MyImgDirectory));
+                }
+            }
+        }
 
+        #endregion
 
-        public ICommand RunCommand => runCommand;
-        private DelegateCommand runCommand;
+        #region commands
 
+        public ICommand SetSettingsCommand => setSettingsCommand;
+        private DelegateCommand setSettingsCommand;
 
         public ICommand AddImagesCommand => addImagesCommand;
         private DelegateCommand addImagesCommand;
 
+        public ICommand ModifyImagesCommand => modifyImagesCommand;
+        private DelegateCommand modifyImagesCommand;
 
+        #endregion
 
 
         internal MainViewModel()
         {
-            runCommand = new DelegateCommand(ExecuteRunCommand, () => { return true; });
-            addImagesCommand = new DelegateCommand(ExecuteRunCommand, () => { return true; });
+            setSettingsCommand = new DelegateCommand(ExecuteSetSettingsCommand, () => { return true; });
+            addImagesCommand = new DelegateCommand(ExecuteAddImages, () => { return true; });
+            modifyImagesCommand = new DelegateCommand(ExecuteModifyImages, () => { return true; });
 
             MyImgDirectory = new SPicsDirectory();
             picsList = new ObservableCollection<Pic>();
-            Window_Loaded();
+            originalPicsList = new ObservableCollection<Pic>();
+
+            LoadSavedImages();
         }
 
-        private void ExecuteRunCommand()
+        private void ExecuteSetSettingsCommand()
         {
-            Window_Loaded();
+            FolderBrowserDialog fd = new FolderBrowserDialog();
+            fd.SelectedPath = MyImgDirectory.path;
+            fd.ShowDialog();
+
+            var xml = LoadSettings();
+            xml.Value = fd.SelectedPath;
+            xml.Save(XmlSettings);
+
+            MyImgDirectory.path = fd.SelectedPath;
         }
 
 
 
+        private void ExecuteAddImages()
+        {
+            Microsoft.Win32.OpenFileDialog ofd = new Microsoft.Win32.OpenFileDialog();
+            ofd.InitialDirectory = MyImgDirectory.path;
+            ofd.Multiselect = true;
+
+            if ((bool)ofd.ShowDialog())
+            {
+                XDocument d = XDocument.Parse(File.ReadAllText(XmlTags));
+                var t = d.Document;
+
+                var settings = new XmlWriterSettings();
+                settings.OmitXmlDeclaration = true;
+                settings.Indent = true;
+                settings.NewLineOnAttributes = true;
+
+                var selectedFiles = ofd.FileNames;
+
+                List<Pic> lst = new List<Pic>();
+
+                foreach (var item in selectedFiles)
+                {
+                    lst.Add(new Pic
+                        {
+                            Path = item,
+                            Image = null,
+                            Name = item.Split('\\').Last(),
+                            Tags = null,
+                            TagsAsString = null,
+                            TagsForUI = null                    
+                        });
+                }                
+
+                AddPicViewModel AddPVM = new AddPicViewModel(lst);
+
+                AddPic f = new AddPic();
+                f.DataContext = AddPVM;
+                f.ShowDialog();
+
+                var myResult = AddPVM.Result_PicListAfterSave;
+
+                if (myResult.Count > 0)
+                {
+                    foreach (var file in myResult)
+                    {
+                        File.Copy(file.Path, MyImgDirectory.path + "\\" + file.Name);
+                        var tmpFile = new XElement("Pic", file.Name, new XAttribute("Tags", file.TagsAsString));
+
+                        d.Document.Element("Pics").Add(tmpFile);
+
+                    }
+
+                    File.WriteAllText(XmlTags, d.Document.ToString(), Encoding.UTF8);
+                    LoadImagesFromTMPfolder();
+                }
+            }
 
 
-        private void Window_Loaded()
+
+        }
+
+        private void ExecuteModifyImages()
+        {            
+            AddPicViewModel AddPVM = new AddPicViewModel(OriginalPicsList.ToList());
+
+            AddPic f = new AddPic();
+            f.DataContext = AddPVM;
+            f.ShowDialog();
+
+            var myResult = AddPVM.Result_PicListAfterSave;
+
+            if (myResult.Count > 0)
+            {
+            }
+
+                //foreach (var file in myResult)
+                //{
+                //File.Copy(file.Path, MyImgDirectory.path + "\\" + file.Name);
+                //var tmpFile = new XElement("Pic", file.Name, new XAttribute("Tags", file.TagsAsString));
+
+                //d.Document.Element("Pics").Add(tmpFile);
+
+                //}
+
+                //File.WriteAllText(XmlTags, d.Document.ToString(), Encoding.UTF8);
+
+                //LoadImagesFromTMPfolder();
+            }
+
+
+
+        private void LoadSavedImages()
+        {
+            try
+            {
+                LoadImagesFromTMPfolder();
+            }
+            catch
+            {
+                ExecuteSetSettingsCommand();
+                LoadImagesFromTMPfolder();
+            }
+        }
+
+
+
+        private void LoadImagesFromTMPfolder()
         {
             // read path from settings
             XElement xDocSet = LoadSettings();
-            
+
             MyImgDirectory.path = xDocSet.Value;
-            XMLSETTINGS = xDocSet.Value;
+            //XMLSETTINGS = xDocSet.Value;
 
 
             // read info
@@ -115,51 +288,47 @@ namespace SPics.Views.VM
                         Name = item.Value,
                         Path = MyImgDirectory.path + "\\" + item.Value,
                         Image = Image.FromFile(MyImgDirectory.path + "\\" + item.Value),
-                        Tags = new List<string>(tagList)
+                        Tags = new List<string>(tagList),
+                        TagsAsString = null,
+                        TagsForUI = null                       
                     });
             }
 
             foreach (var item in MyImgDirectory.Files)
             {
+                OriginalPicsList.Add(item);
                 PicsList.Add(item);
             }
-
         }
 
 
 
 
-        private void btnAdd_Click()
+        public static List<Pic> GetFilteredResultsByName(List<Pic> originalList, string filter)
         {
-            OpenFileDialog ofd = new OpenFileDialog();
-            ofd.InitialDirectory = XMLSETTINGS;
-            ofd.Multiselect = true;
+            List<Pic> NewList = new List<Pic>();
 
-            if ((bool)ofd.ShowDialog())
+            foreach (var p in originalList)
             {
-                XDocument d = XDocument.Parse(File.ReadAllText(XmlTags));
-                var t = d.Document;
-
-                var settings = new XmlWriterSettings();
-                settings.OmitXmlDeclaration = true;
-                settings.Indent = true;
-                settings.NewLineOnAttributes = true;
-
-                var selectedFiles = ofd.FileNames;
-                foreach (var file in selectedFiles)
-                {
-                    var name = file.Split('\\').Last();
-                    File.Copy(file, XMLSETTINGS + "\\" + name);
-                    var tmpFile = new XElement("Pic", name, new XAttribute("Tags", "soyunTag"));
-
-                    d.Document.Element("Pics").Add(tmpFile);
-
-                }
-
-                File.WriteAllText(XmlTags, d.Document.ToString(), Encoding.UTF8);
-
-
+                if (p.Name.ToUpper().Contains(filter.ToUpper()))
+                    NewList.Add(p);                
             }
+
+            return NewList.ToList();
+        }
+
+
+        public static List<Pic> GetFilteredResultsByTag(List<Pic> originalList, string filter)
+        {
+            List<Pic> NewList = new List<Pic>();
+
+            foreach (var p in originalList)
+            {
+                if (p.TagsAsString.ToUpper().Contains(filter.ToUpper()))
+                    NewList.Add(p);
+            }
+
+            return NewList.ToList();
         }
 
 
@@ -169,6 +338,7 @@ namespace SPics.Views.VM
         {
             return XElement.Parse(File.ReadAllText(XmlSettings));
         }
+
 
         private XElement LoadTags()
         {
