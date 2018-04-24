@@ -11,6 +11,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Controls;
 using System.Windows.Forms;
 using System.Windows.Input;
 using System.Xml;
@@ -127,6 +128,9 @@ namespace SPics.Views.VM
         public ICommand ModifyImagesCommand => modifyImagesCommand;
         private DelegateCommand modifyImagesCommand;
 
+        public ICommand CreateFolderCommand => createFolderCommand;
+        private DelegateCommand createFolderCommand;
+
         #endregion
 
 
@@ -135,6 +139,7 @@ namespace SPics.Views.VM
             setSettingsCommand = new DelegateCommand(ExecuteSetSettingsCommand, () => { return true; });
             addImagesCommand = new DelegateCommand(ExecuteAddImages, () => { return true; });
             modifyImagesCommand = new DelegateCommand(ExecuteModifyImages, () => { return true; });
+            createFolderCommand = new DelegateCommand(ExecuteCreateFolder, () => { return true; });
 
             MyImgDirectory = new SPicsDirectory();
             picsList = new ObservableCollection<Pic>();
@@ -155,6 +160,26 @@ namespace SPics.Views.VM
 
             MyImgDirectory.path = fd.SelectedPath;
         }
+
+
+
+        private TreeViewModel tvContent;
+        public TreeViewModel TvContent
+        {
+            get
+            {
+                return tvContent;
+            }
+            set
+            {
+                if (value != tvContent)
+                {
+                    tvContent = value;
+                    NotifyPropertyChanged(nameof(TvContent));
+                }
+            }
+        }
+
 
 
 
@@ -214,10 +239,18 @@ namespace SPics.Views.VM
                     LoadImagesFromTMPfolder();
                 }
             }
-
-
-
         }
+
+
+        private void ExecuteCreateFolder()
+        {
+            FolderBrowserDialog fd = new FolderBrowserDialog();
+            fd.SelectedPath = MyImgDirectory.path;
+            fd.ShowDialog();
+
+            CreateTreeviewItems();
+        }
+
 
         private void ExecuteModifyImages()
         {            
@@ -263,6 +296,64 @@ namespace SPics.Views.VM
         }
 
 
+        private void CreateTreeviewItems()
+        {
+            string path1 = /*MyImgDirectory.path +*/ @"\SubDir1";
+            string path2 = /*MyImgDirectory.path +*/ @"\SubDir2";
+
+            var tmp = Directory.GetDirectories(MyImgDirectory.path);
+
+            TreeViewModel tvm = new TreeViewModel();
+
+            TVMlevel empty = new TVMlevel
+            {
+                Name = "prueba",
+                Parent = "parent",
+                Children = new ObservableCollection<TVMlevel> { new TVMlevel {Name = tmp.FirstOrDefault() } },
+            };
+
+            TVMlevel level2b = new TVMlevel
+            {
+                Name = path2,
+                Parent = MyImgDirectory.path,
+                Children = new ObservableCollection<TVMlevel>
+                {
+                    empty
+                },
+            };
+
+            TVMlevel level2 = new TVMlevel
+            {
+                Name = path1,
+                Parent = MyImgDirectory.path,
+                Children = new ObservableCollection<TVMlevel>
+                {
+                  level2b
+                }
+            };
+
+            TVMlevel level = new TVMlevel
+            {
+                Name = MyImgDirectory.path.Split('\\').Last(),
+                Parent = "root",
+                Children = new ObservableCollection<TVMlevel>
+                {
+                  level2,
+                  level2b
+                }
+            };
+
+            tvm.Children = new ObservableCollection<TVMlevel>()
+            {
+                level,
+                level2,
+                level2b
+            };
+
+            TvContent = tvm;
+        }
+
+
 
         private void LoadImagesFromTMPfolder()
         {
@@ -272,6 +363,8 @@ namespace SPics.Views.VM
             MyImgDirectory.path = xDocSet.Value;
             //XMLSETTINGS = xDocSet.Value;
 
+
+            CreateTreeviewItems();
 
             // read info
             XElement xDocTags = LoadTags();
@@ -287,7 +380,7 @@ namespace SPics.Views.VM
                     {
                         Name = item.Value,
                         Path = MyImgDirectory.path + "\\" + item.Value,
-                        Image = Image.FromFile(MyImgDirectory.path + "\\" + item.Value),
+                        Image = System.Drawing.Image.FromFile(MyImgDirectory.path + "\\" + item.Value),
                         Tags = new List<string>(tagList),
                         TagsAsString = null,
                         TagsForUI = null                       

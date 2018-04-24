@@ -64,6 +64,8 @@
     <Compile Include="Views\VM\AddPicViewModel.cs" />
     <Compile Include="Utils\DelegateCommand.cs" />
     <Compile Include="Views\VM\MainViewModel.cs" />
+    <Compile Include="Views\VM\TreeViewModel.cs" />
+    <Compile Include="Views\VM\TVMlevel.cs" />
     <Page Include="Views\MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

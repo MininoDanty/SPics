@@ -4,12 +4,14 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:SPics"
+        xmlns:local2="clr-namespace:SPics.Views.VM"
         mc:Ignorable="d"
         xmlns:converters="clr-namespace:SPics.Converters"
         Title="MainWindow" Height="650" Width="800" WindowStartupLocation="CenterScreen" WindowState="Maximized">
     <Window.Resources>
         <converters:ImageConverter x:Key="ImageConverter" />
     </Window.Resources>
+  
 
     <Grid>
         <Grid.RowDefinitions>
@@ -37,7 +39,34 @@
 
         <Button  Grid.Column="0" Grid.Row="0"  x:Name="btnMod" Content="ModPics" HorizontalAlignment="Left" Margin="150,70,0,0" VerticalAlignment="Top" Width="100" Command="{Binding ModifyImagesCommand}"  />
 
-        <ListView  Grid.Column="0" Grid.Row="1"  x:Name="lvPics" Margin="10,10,10,10"  ItemsSource="{Binding PicsList}">
+        <!--
+        <TreeView Grid.Column="0" Grid.Row="1"  x:Name="tvDirs" Margin="10,10,10,10" HorizontalAlignment="Left" Width="180" >
+            <TreeViewItem ItemsSource="{Binding TvContent.Children}" Header="Niveles">
+                <TreeViewItem.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Margin="10,0,0,0" Text="{Binding Name}" />
+                        </StackPanel>
+                    </DataTemplate>
+                </TreeViewItem.ItemTemplate>
+            </TreeViewItem>
+        </TreeView>
+-->
+
+        <TreeView Grid.Column="0" Grid.Row="1"  x:Name="tvDirs" Margin="0,10" HorizontalAlignment="Left" Width="300" ItemsSource="{Binding TvContent.Children}" >
+            <TreeView.ContextMenu>
+                <ContextMenu>
+                    <MenuItem Header="Crear carpeta" Command="{Binding CreateFolderCommand}" />
+                </ContextMenu>
+            </TreeView.ContextMenu>
+            <TreeView.ItemTemplate>
+                <HierarchicalDataTemplate ItemsSource="{Binding Children}" DataType="{x:Type local2:TVMlevel}">
+                    <TreeViewItem Header="{Binding Name}"/>
+                </HierarchicalDataTemplate>
+            </TreeView.ItemTemplate>
+        </TreeView>
+
+        <ListView  Grid.Column="0" Grid.Row="1"  x:Name="lvPics" Margin="310,10,10,10" ItemsSource="{Binding PicsList}">
             <ListView.View>
                 <GridView>
                     <GridViewColumn Header="Name" DisplayMemberBinding="{Binding Name}" />
@@ -52,11 +81,6 @@
 
                 </GridView>
             </ListView.View>
-            <ListView.ContextMenu>
-                <ContextMenu>
-                    <MenuItem Header="Crear carpeta" Command="{Binding}" />
-                </ContextMenu>
-            </ListView.ContextMenu>
         </ListView>
     </Grid>
 </Window>
