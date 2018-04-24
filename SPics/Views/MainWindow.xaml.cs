@@ -35,6 +35,13 @@ namespace SPics
             vm.PicsList = new ObservableCollection<Models.Pic>(r);
         }
 
+        private void tvDirs_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+        {
+            var vm = (MainViewModel)this.DataContext;
+            vm.SelectedTvItem = (TVMlevel)e.NewValue;
+        }
+
+
 
     }
 }

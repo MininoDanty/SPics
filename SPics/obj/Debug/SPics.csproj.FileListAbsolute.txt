@@ -17,3 +17,14 @@ c:\users\quantobit\documents\visual studio 2015\Projects\SPics\SPics\obj\Debug\V
 c:\users\quantobit\documents\visual studio 2015\Projects\SPics\SPics\obj\Debug\Views\MainWindow.g.cs
 c:\users\quantobit\documents\visual studio 2015\Projects\SPics\SPics\obj\Debug\Views\MainWindow.baml
 c:\users\quantobit\documents\visual studio 2015\Projects\SPics\SPics\obj\Debug\GeneratedInternalTypeHelper.g.cs
+C:\Users\Quantobit\documents\visual studio 2015\Projects\SPics\SPics\bin\Debug\System.Windows.Interactivity.dll
+C:\Users\Quantobit\documents\visual studio 2015\Projects\SPics\SPics\bin\Debug\System.Windows.Interactivity.xml
+C:\Users\Quantobit\documents\visual studio 2015\Projects\SPics\SPics\bin\Debug\de\System.Windows.Interactivity.resources.dll
+C:\Users\Quantobit\documents\visual studio 2015\Projects\SPics\SPics\bin\Debug\en\System.Windows.Interactivity.resources.dll
+C:\Users\Quantobit\documents\visual studio 2015\Projects\SPics\SPics\bin\Debug\es\System.Windows.Interactivity.resources.dll
+C:\Users\Quantobit\documents\visual studio 2015\Projects\SPics\SPics\bin\Debug\fr\System.Windows.Interactivity.resources.dll
+C:\Users\Quantobit\documents\visual studio 2015\Projects\SPics\SPics\bin\Debug\it\System.Windows.Interactivity.resources.dll
+C:\Users\Quantobit\documents\visual studio 2015\Projects\SPics\SPics\bin\Debug\ja\System.Windows.Interactivity.resources.dll
+C:\Users\Quantobit\documents\visual studio 2015\Projects\SPics\SPics\bin\Debug\ko\System.Windows.Interactivity.resources.dll
+C:\Users\Quantobit\documents\visual studio 2015\Projects\SPics\SPics\bin\Debug\zh-Hans\System.Windows.Interactivity.resources.dll
+C:\Users\Quantobit\documents\visual studio 2015\Projects\SPics\SPics\bin\Debug\zh-Hant\System.Windows.Interactivity.resources.dll

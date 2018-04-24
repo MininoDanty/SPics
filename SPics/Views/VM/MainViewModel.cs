@@ -115,6 +115,23 @@ namespace SPics.Views.VM
             }
         }
 
+        private TVMlevel selectedTvItem;
+        public TVMlevel SelectedTvItem
+        {
+            get
+            {
+                return selectedTvItem;
+            }
+            set
+            {
+                if (value != selectedTvItem)
+                {
+                    selectedTvItem = value;
+                    NotifyPropertyChanged(nameof(SelectedTvItem));
+                }
+            }
+        }
+
         #endregion
 
         #region commands
@@ -160,6 +177,7 @@ namespace SPics.Views.VM
 
             MyImgDirectory.path = fd.SelectedPath;
         }
+
 
 
 
@@ -245,7 +263,7 @@ namespace SPics.Views.VM
         private void ExecuteCreateFolder()
         {
             FolderBrowserDialog fd = new FolderBrowserDialog();
-            fd.SelectedPath = MyImgDirectory.path;
+            fd.SelectedPath = SelectedTvItem.Name; //MyImgDirectory.path;
             fd.ShowDialog();
 
             CreateTreeviewItems();
@@ -295,59 +313,128 @@ namespace SPics.Views.VM
             }
         }
 
+      
+
+        private TVMlevel AddDepthLvl(TVMlevel currentLvl, List<string> paths, string parent)
+        {
+            TVMlevel current;
+
+            List<TVMlevel> result = new List<TVMlevel>();
+
+            foreach (var item in paths)
+            {
+                TVMlevel Lvl = new TVMlevel
+                {
+                    Name = item.Split('\\').LastOrDefault(),
+                    CompletePath = item,
+                    Parent = parent,
+                    Children = null,
+                };
+
+                result.Add(Lvl);
+            }
+
+            current = new TVMlevel
+            {
+                Name = "",
+                CompletePath = "",
+                Parent = "",
+                Children = new ObservableCollection<TVMlevel>(result),
+            };
+
+            return current;
+        }
 
         private void CreateTreeviewItems()
         {
-            string path1 = /*MyImgDirectory.path +*/ @"\SubDir1";
-            string path2 = /*MyImgDirectory.path +*/ @"\SubDir2";
+            var tmpDirs = Directory.GetDirectories(MyImgDirectory.path, "*", SearchOption.AllDirectories).ToList();
 
-            var tmp = Directory.GetDirectories(MyImgDirectory.path);
+            // para los directorios de un mismo nivel
+            Dictionary<int, List<string>> dirsLevel = new Dictionary<int, List<string>>();
+
+            var tmpLvls = tmpDirs.Select(d => d.Split('\\').Count()).OrderBy(o => o).ToList();            
+
+            for (int i = 0; i < tmpDirs.Count(); i++)
+            {
+                var currentLvl = tmpLvls[i];
+                var dirsList = tmpDirs.Where(d => d.Split('\\').Count() == currentLvl).ToList();
+
+                dirsLevel.Add(currentLvl, dirsList);
+
+                // para saltarnos lo iguales le sumamos la cantidad de añadidos y le restamos uno para la próxima vuelta
+                i += dirsList.Count - 1;
+            }
 
             TreeViewModel tvm = new TreeViewModel();
+            List<TVMlevel> tmpList = new List<TVMlevel>();
+            List<TVMlevel> GeneralList = new List<TVMlevel>();
 
-            TVMlevel empty = new TVMlevel
+            // root dir
+            TVMlevel rootLvl = new TVMlevel
             {
-                Name = "prueba",
-                Parent = "parent",
-                Children = new ObservableCollection<TVMlevel> { new TVMlevel {Name = tmp.FirstOrDefault() } },
-            };
-
-            TVMlevel level2b = new TVMlevel
-            {
-                Name = path2,
-                Parent = MyImgDirectory.path,
-                Children = new ObservableCollection<TVMlevel>
-                {
-                    empty
-                },
-            };
-
-            TVMlevel level2 = new TVMlevel
-            {
-                Name = path1,
-                Parent = MyImgDirectory.path,
-                Children = new ObservableCollection<TVMlevel>
-                {
-                  level2b
-                }
-            };
-
-            TVMlevel level = new TVMlevel
-            {
-                Name = MyImgDirectory.path.Split('\\').Last(),
+                Name = MyImgDirectory.path.Split('\\').LastOrDefault(),
+                CompletePath = MyImgDirectory.path,
                 Parent = "root",
-                Children = new ObservableCollection<TVMlevel>
-                {
-                  level2,
-                  level2b
-                }
+                Children = null,
             };
 
+            // para cada treeviewitem
+            TVMlevel tmpLvl = new TVMlevel();
+
+            int index = dirsLevel.First().Key;
+
+            // por cada path del dir
+            for (int i = 0; i < dirsLevel.Count; i++)
+            {
+                string parent = "";
+
+                var lvl = dirsLevel.Where(x => x.Key == index + i).FirstOrDefault().Key;
+                var dirs = dirsLevel.Where(x => x.Key == index + i).FirstOrDefault().Value;
+
+                var predecessors = dirsLevel.Where(x => x.Key == index + i - 1).FirstOrDefault().Value;
+
+                // añadimos los hijos al anterior
+                if (i > 0)
+                {
+                    // por cada directorio actual
+                    foreach (var currentLvlDir in dirs)
+                    {
+                        var ToCompare = currentLvlDir.Split('\\').Reverse().Skip(1).Reverse();
+                        string CurrentDirString = string.Join("\\", ToCompare);
+
+                        // por cada directorio de la vuelta anterior
+                        foreach (var predLvlDir in predecessors)
+                        {                            
+                            // si contiene la ruta, es el parent
+                            if (CurrentDirString == predLvlDir)
+                            {
+                                parent = predLvlDir;
+                                tmpLvl = GeneralList.ToList().Single(x => x.CompletePath == parent);
+
+                                tmpLvl.Children = new ObservableCollection<TVMlevel>(GeneralList.ToList());                                
+                                break;
+                            }
+                        }
+
+
+                    }
+                }
+
+                //tmpList = AddDepthLvl(dirs, parent).ToList();
+                GeneralList.Add(tmpLvl);
+                tmpLvl = AddDepthLvl(new TVMlevel(), dirs, parent);
+
+
+            }
+
+                
+            
+
+            rootLvl.Children = new ObservableCollection<TVMlevel>(/*tmpList*/ GeneralList );
+                   
             tvm.Children = new ObservableCollection<TVMlevel>()
             {
-                level,
-                level2,
-                level2b
+                rootLvl,
             };
 
             TvContent = tvm;

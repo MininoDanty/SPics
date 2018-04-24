@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:SPics"
         xmlns:local2="clr-namespace:SPics.Views.VM"
+        xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
         mc:Ignorable="d"
         xmlns:converters="clr-namespace:SPics.Converters"
         Title="MainWindow" Height="650" Width="800" WindowStartupLocation="CenterScreen" WindowState="Maximized">
@@ -53,20 +54,29 @@
         </TreeView>
 -->
 
-        <TreeView Grid.Column="0" Grid.Row="1"  x:Name="tvDirs" Margin="0,10" HorizontalAlignment="Left" Width="300" ItemsSource="{Binding TvContent.Children}" >
+        <TreeView Grid.Column="0" Grid.Row="1"  x:Name="tvDirs" Margin="0,10" HorizontalAlignment="Left" Width="400" ItemsSource="{Binding TvContent.Children}" SelectedItemChanged="tvDirs_SelectedItemChanged"   >
+
+
+            <TreeView.Resources>
+                <HierarchicalDataTemplate ItemsSource="{Binding Children}" DataType="{x:Type local2:TVMlevel}" >
+                    <TextBlock Text="{Binding Name}"/>
+                    <!-- <TreeViewItem  Header="{Binding Name}"  />-->
+                </HierarchicalDataTemplate>
+
+
+            </TreeView.Resources>
+
+            
             <TreeView.ContextMenu>
                 <ContextMenu>
                     <MenuItem Header="Crear carpeta" Command="{Binding CreateFolderCommand}" />
                 </ContextMenu>
             </TreeView.ContextMenu>
-            <TreeView.ItemTemplate>
-                <HierarchicalDataTemplate ItemsSource="{Binding Children}" DataType="{x:Type local2:TVMlevel}">
-                    <TreeViewItem Header="{Binding Name}"/>
-                </HierarchicalDataTemplate>
-            </TreeView.ItemTemplate>
+            
+
         </TreeView>
 
-        <ListView  Grid.Column="0" Grid.Row="1"  x:Name="lvPics" Margin="310,10,10,10" ItemsSource="{Binding PicsList}">
+        <ListView  Grid.Column="0" Grid.Row="1"  x:Name="lvPics" Margin="410,10,10,10" ItemsSource="{Binding PicsList}">
             <ListView.View>
                 <GridView>
                     <GridViewColumn Header="Name" DisplayMemberBinding="{Binding Name}" />
