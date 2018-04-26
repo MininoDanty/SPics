@@ -28,3 +28,5 @@ C:\Users\Quantobit\documents\visual studio 2015\Projects\SPics\SPics\bin\Debug\j
 C:\Users\Quantobit\documents\visual studio 2015\Projects\SPics\SPics\bin\Debug\ko\System.Windows.Interactivity.resources.dll
 C:\Users\Quantobit\documents\visual studio 2015\Projects\SPics\SPics\bin\Debug\zh-Hans\System.Windows.Interactivity.resources.dll
 C:\Users\Quantobit\documents\visual studio 2015\Projects\SPics\SPics\bin\Debug\zh-Hant\System.Windows.Interactivity.resources.dll
+C:\Users\Quantobit\documents\visual studio 2015\Projects\SPics\SPics\obj\Debug\Views\About.g.cs
+C:\Users\Quantobit\documents\visual studio 2015\Projects\SPics\SPics\obj\Debug\Views\About.baml

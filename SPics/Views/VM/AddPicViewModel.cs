@@ -4,16 +4,13 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
-using System.Windows;
 using System.Windows.Input;
 
 namespace SPics.Views.VM
 {
     internal class AddPicViewModel : INotifyPropertyChanged
     {        
-        public ICommand SaveCommand => saveCommand;
-        private DelegateCommand saveCommand;
-
+        
         internal List<Pic> Result_PicListAfterSave = new List<Pic>();
 
         private ObservableCollection<Pic> picsList;        
@@ -32,7 +29,6 @@ namespace SPics.Views.VM
                 }
             }
         }
-
 
         private Pic selectedPic;
         public Pic SelectedPic
@@ -57,6 +53,10 @@ namespace SPics.Views.VM
             }
         }
 
+        public ICommand SaveCommand => saveCommand;
+        private DelegateCommand saveCommand;
+
+
         internal AddPicViewModel(IEnumerable<Pic> Files)
         {
             saveCommand = new DelegateCommand(ExecuteSaveCommand, () => { return true; });
@@ -64,19 +64,16 @@ namespace SPics.Views.VM
 
             foreach (var item in Files)
             {
-                PicsList.Add(
-                    new Pic
-                    {
-                        Name = item.Name,
-                        Path = item.Path,
-                        Image = item.Image,
-                        Tags = item.Tags,
-                        TagsAsString = item.TagsAsString,
-                        TagsForUI = item.TagsAsString
-                    });
+                PicsList.Add(ExtMeth.NewPic(
+                    item.Name, 
+                    item.Path, 
+                    item.Image, 
+                    item.Tags, 
+                    item.TagsAsString, 
+                    item.TagsForUI
+                    ));                    
             }
         }
-
 
         public List<Pic> SaveTags(List<Pic> lista, Pic p)
         {
@@ -90,7 +87,6 @@ namespace SPics.Views.VM
 
             return myTempList;
         }
-
 
         public void ExecuteSaveCommand()
         {

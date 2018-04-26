@@ -27,6 +27,7 @@
         <Label  Grid.Column="0" Grid.Row="0"  x:Name="label" Content="Settings path" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
         <TextBox Grid.Column="0" Grid.Row="0" x:Name="tbSettings" HorizontalAlignment="Left" Height="23" Margin="105,13,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="600" Text="{Binding MyImgDirectory.path}"/>
         <Button  Grid.Column="0" Grid.Row="0"  x:Name="btnSettings" Content="..." HorizontalAlignment="Left" Margin="710,13,0,0" VerticalAlignment="Top" Width="30" Command="{Binding SetSettingsCommand}"  />
+        <Button  Grid.Column="0" Grid.Row="0"  x:Name="btnAbout" Content="About" HorizontalAlignment="Left" Margin="750,13,0,0" VerticalAlignment="Top" Width="40"  Command="{Binding AboutCommand}" />
 
 
         <Label  Grid.Column="0" Grid.Row="0"  x:Name="search" Content="Search by name" HorizontalAlignment="Left" Margin="10,40,0,0" VerticalAlignment="Top"/>
@@ -54,12 +55,12 @@
         </TreeView>
 -->
 
-        <TreeView Grid.Column="0" Grid.Row="1"  x:Name="tvDirs" Margin="0,10" HorizontalAlignment="Left" Width="400" ItemsSource="{Binding TvContent.Children}" SelectedItemChanged="tvDirs_SelectedItemChanged"   >
+        <TreeView Grid.Column="0" Grid.Row="1"  x:Name="tvDirs" Margin="0,10" HorizontalAlignment="Left" Width="400" ItemsSource="{Binding TvContent.Children}"  SelectedItemChanged="tvDirs_SelectedItemChanged"   >
 
 
             <TreeView.Resources>
-                <HierarchicalDataTemplate ItemsSource="{Binding Children}" DataType="{x:Type local2:TVMlevel}" >
-                    <TextBlock Text="{Binding Name}"/>
+                <HierarchicalDataTemplate ItemsSource="{Binding Children}" DataType="{x:Type local2:TVMlevel}"  >
+                    <TextBlock Text="{Binding Name}" />
                     <!-- <TreeViewItem  Header="{Binding Name}"  />-->
                 </HierarchicalDataTemplate>
 

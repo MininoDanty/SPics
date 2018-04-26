@@ -59,6 +59,10 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Converters\ImageConverter.cs" />
+    <Compile Include="Utils\ExtMeth.cs" />
+    <Compile Include="Views\About.xaml.cs">
+      <DependentUpon>About.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\AddPic.xaml.cs">
       <DependentUpon>AddPic.xaml</DependentUpon>
     </Compile>
@@ -67,6 +71,10 @@
     <Compile Include="Views\VM\MainViewModel.cs" />
     <Compile Include="Views\VM\TreeViewModel.cs" />
     <Compile Include="Views\VM\TVMlevel.cs" />
+    <Page Include="Views\About.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Views\MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

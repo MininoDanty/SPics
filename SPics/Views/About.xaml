@@ -1,0 +1,33 @@
+﻿<Window
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:SPics.Views"
+        xmlns:Converters="clr-namespace:SPics.Converters" x:Class="SPics.Views.About"
+        mc:Ignorable="d"
+        Title="About" Height="150" Width="300">
+    
+    <Window.Resources>
+        <Converters:ImageConverter x:Key="ImageConverter" />
+    </Window.Resources>
+
+    <Grid Margin="0,0,0,0">
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
+        <TextBlock x:Name="textBlock" HorizontalAlignment="Left" Margin="35,36,0,0" TextWrapping="Wrap" Text="v. 0.0.1" VerticalAlignment="Top"/>
+        <TextBlock x:Name="textBlock2" HorizontalAlignment="Left" Margin="35,52,0,0" TextWrapping="Wrap" Text="by sMedina" VerticalAlignment="Top"/>
+
+
+
+    </Grid>
+
+</Window>
